@@ -1,0 +1,116 @@
+大额面子
+<?xml version="1.0" encoding="utf-8"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" runtime="2017/5/28 *:0/1:0" ignoreSameBdhm="true" saveDb="true" saveXml="true" serviceName="xxx" displayName="绍兴市政务服务网数据交换对接" description="绍兴市政务服务网数据交换对接">
+  <UserType value="0" exportmappath="\\TempData\\" importmappath="E:\\work\\TempData\\ZhengWuWang\\ImportData\\" />
+  <Services>
+    <Service lb="SPT">
+      <Url>http://59.202.58.68</Url>
+      <RefreshSecretSubUrl>/gateway/app/refreshTokenByKey.htm</RefreshSecretSubUrl>
+      <IssueSubUrl>/gateway/api/issue.htm</IssueSubUrl>
+      <UserName>03b47c0afb8841bb8bb6b887b2ac9120</UserName>
+      <PassWord>c107c6e960ff4629acfa51ed69ecf5b2</PassWord>
+      <RequestSecret></RequestSecret>
+      <RefreshSecret></RefreshSecret>
+      <IssueCode>一窗平台分发码 如绍兴为33000100000001</IssueCode>
+      <AreaName>一窗平台使用地区 如绍兴为绍兴市一窗受理平台</AreaName>	  
+    </Service>
+  </Services>
+  <QueryLinks>
+    <Link des="不动产对外查询" tag="BDCDWCX">
+      <DataSource>sxsbdcdjfw</DataSource>
+      <DataBase>bdcdwcx</DataBase>
+      <UserName>bdcdwcx</UserName>
+      <PassWord>bdcdwcx</PassWord>
+    </Link>
+    <Link des="绍兴" qxdm="330602" fwqbm="1">
+      <DataSource>kfhzbdc200</DataSource>
+      <DataBase>bdcdj</DataBase>
+      <UserName>bdcdj</UserName>
+      <PassWord>bdcdj</PassWord>
+    </Link>
+  </QueryLinks>
+  <QuerySqls>
+    <QuerySql des="1、申报信息表 省一窗用" toappcode="2" tablename="pre_apasinfo">
+      <Sql>
+        SELECT '33060217'||substr(extract (year from A.START_TIME_),3,2) || LPAD (extract (month from A.START_TIME_) , 2 , '0') || LPAD (extract (DAY from A.START_TIME_) , 2 , '0') ||'3' PROJID,'' PROJPWD,'0' IS_MANUBRIUM,GX.SERVICECODE
+        ,gx.deptId  SERVICE_DEPTID
+        ,'' BUS_MODE
+        ,'' BUS_MODE_DESC,'1' SERVICEVERSION
+        ,gx.servicename SERVICENAME,D.NAME_ PROJECTNAME,'承诺件' INFOTYPE,'0' BUS_TYPE,'' REL_BUS_ID
+        ,B.QLRMC APPLYNAME,nvl(BDCDJ.GETENUMNAME('ZJZL', B.ZJZL),'无') APPLY_CARDTYPE
+        ,nvl(B.ZJH,'无') APPLY_CARDNUMBER,CASE WHEN B.QLRMC IS NOT NULL THEN B.QLRMC ELSE B.QLRDLRMC END AS CONTACTMAN
+        ,'' CONTACTMAN_CARDTYPE,'' CONTACTMAN_CARDNUMBER,CASE WHEN B.YDDH IS NULL THEN NVL(B.GDDH,'') ELSE B.YDDH END AS TELPHONE
+        ,'' POSTCODE,'' ADDRESS,'' LEGALMAN
+        ,gx.deptId DEPTID
+        ,gx.deptName  DEPTNAME
+        ,gx.SS_ORGCODE   SS_ORGCODE
+        ,'' RECEIVE_USEID,sl.slr RECEIVE_NAME,'2' APPLYFROM
+        ,'01' APPROVE_TYPE,'99' APPLY_PROPERTIY,TO_CHAR(A.START_TIME_,'YYYY-MM-DD HH24:MI:SS') RECEIVETIME,'' BELONGTO
+        ,gx.qxdm AREACODE
+        ,'1' DATASTATE,gx.BelongSystem BELONGSYSTEM,'' EXTEND
+        ,TO_CHAR(A.START_TIME_,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME,'I' SYNC_STATUS,'1' DATAVERSION
+
+        FROM GISQBPM.ACT_HI_PROCINST A
+        INNER JOIN GISQBPM.ACT_HI_BIZ_PROCINST D ON D.PROC_INST_ID_=A.PROC_INST_ID_
+        INNER JOIN (select * from (SELECT * FROM BDCDJ.QLR  WHERE YWH ='{0}'  order by qszt, bsm desc) q where  ROWNUM=1) B ON B.YWH=A.BUSINESS_KEY_
+        JOIN  (SELECT DJXL,YWH,slr FROM BDCDJ.SLSQ WHERE  YWH ='{0}' AND ROWNUM=1) SL ON SL.YWH =B.YWH
+        inner join (select ywh, case when instr(bdcdyh,'330602015')=1 then '001008006007012'
+ when instr(bdcdyh,'330602016')=1 then '001008006007012'
+  when instr(bdcdyh,'330602020')=1 then '001008006007012'
+   when instr(bdcdyh,'330604')=1 then '001008006007012'
+   else '001008006001022' end deptId
+  from  bdcdj.djfz_dymx where ywh='{0}' and rownum=1) dep on dep.ywh = sl.ywh
+        JOIN BDCDWCX.QLSXDYGX GX ON GX.LCDM=SL.DJXL and dep.deptId = gx.deptID
+        WHERE A.BUSINESS_KEY_='{0}'
+      </Sql>
+    </QuerySql>
+    <QuerySql des="2、申报材料表 省一窗用" toappcode="2" tablename="pre_attr" IsMulti="1">
+      <Sql>SELECT RAWTOHEX(SYS_GUID()) UNID,'' PROJID,C.DATUM_NAME ATTRNAME,C.DATUMINST_GUID ATTRID
+,C.SEQ_ORDER SORTID,'纸质收取' TAKETYPE
+,CASE WHEN NVL(C.ORIGINAL_NUMBER,0)+NVL(C.COPY_NUMBER,0)+NVL(C.ELEC_NUMBER,0)&gt;0 THEN '1'
+ELSE '0'
+END AS
+ISTAKE,NVL(C.ORIGINAL_NUMBER,0)+NVL(C.COPY_NUMBER,0)+NVL(C.ELEC_NUMBER,0) AMOUNT
+,TO_CHAR(C.GXSJ,'YYYY-MM-DD HH24:MI:SS') TAKETIME,'' MEMO,'029' BELONGSYSTEM,'' AREACODE ,'' EXTEND
+,TO_CHAR(C.GXSJ,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME,'' FILENAME
+,'I' SYNC_STATUS,'1' DATAVERSION,'' FILEURL,'' FILEPWD
+
+FROM GISQBPM.ACT_HI_PROCINST A
+INNER JOIN BDCDJ.T_XM_PROJECT B ON A.BUSINESS_KEY_=B.PROJECT_ID
+INNER JOIN BDCDJ.T_XM_DATUM C ON C.BIZINST_GUID=B.BIZINST_GUID
+WHERE  A.BUSINESS_KEY_='{0}'</Sql>
+    </QuerySql>
+    <QuerySql des="3、受理信息表 省一窗用" toappcode="2" tablename="pre_accept">
+      <Sql>SELECT '' PROJID,B.SLR ACCEPT_MAN
+	  ,gx.deptName HANDER_DEPTNAME
+	  , '' HANDER_DEPTID,'' AREACODE,TO_CHAR(A.START_TIME_,'YYYY-MM-DD HH24:MI:SS') ACCEPT_TIME
+        ,TO_CHAR(B.BLTS) PROMISEVALUE,'工作日' PROMISETYPE,TO_CHAR(B.BJSJ,'YYYY-MM-DD HH24:MI:SS') PROMISE_ETIME
+        ,'029'  BELONGSYSTEM,'' EXTEND,TO_CHAR(A.START_TIME_,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME
+        ,'I' SYNC_STATUS,'1' DATAVERSION	
+        FROM GISQBPM.ACT_HI_PROCINST A
+        INNER JOIN (SELECT SLR,BLTS,BJSJ,YWH FROM BDCDJ.SLSQ WHERE  YWH ='{0}' AND ROWNUM=1) B ON B.YWH=A.BUSINESS_KEY_
+        inner join (select case when instr(bdcdyh,'330602015')=1 then '001008006007012'
+ when instr(bdcdyh,'330602016')=1 then '001008006007012'
+  when instr(bdcdyh,'330602020')=1 then '001008006007012'
+   when instr(bdcdyh,'330604')=1 then '001008006007012'
+   else '001008006001022' end deptId
+  from  bdcdj.djfz_dymx where ywh='{0}' and rownum=1) dep
+        JOIN BDCDWCX.QLSXDYGX GX ON GX.LCDM=B.DJXL and dep.deptId = gx.deptID        
+        WHERE A.BUSINESS_KEY_='{0}'
+</Sql>
+    </QuerySql>
+    <QuerySql des="4、办结信息表 省一窗用" toappcode="2" tablename="pre_transact">
+      <Sql>SELECT '' PROJID,D.STAFF_NAME TRANSACT_USER
+  ,'' HANDER_DEPTNAME,'' HANDER_DEPTID,'' AREACODE,TO_CHAR(A.END_TIME_,'YYYY-MM-DD HH24:MI:SS') TRANSACT_TIME,'办结' TRANSACT_RESULT,'准予许可' TRANSACT_DESCRIBE
+,nvl(zs.bdcqzh ,'无') RESULT_CODE,'' REMARK,'029' BELONGSYSTEM,'' EXTEND
+,TO_CHAR(A.END_TIME_,'YYYY-MM-DD HH24:MI:SS') CREATE_TIME,'I' SYNC_STATUS,'1' DATAVERSION 
+FROM GISQBPM.ACT_HI_PROCINST A
+INNER JOIN GISQBPM.ACT_HI_TASKINST B ON A.PROC_INST_ID_=B.PROC_INST_ID_
+INNER JOIN PLATFORM.BT_USER D ON D.USERNAME=B.ASSIGNEE_
+LEFT join (select bdcqzh,ywh from bdcdj.djfz_cqzs where ywh= '{0}' and rownum =1) zs on zs.ywh = A.Business_Key_
+WHERE A.BUSINESS_KEY_='{0}' AND A.END_TIME_ IS NOT NULL AND NVL(A.DELETE_REASON_,'-1')!='ACTIVITI_DELETED'
+AND NOT EXISTS (SELECT 1 FROM GISQBPM.ACT_HI_TASKINST C WHERE C.PROC_INST_ID_=B.PROC_INST_ID_ AND C.END_TIME_&gt;B.END_TIME_)</Sql>
+    </QuerySql>
+  
+  </QuerySqls>
+</Root>

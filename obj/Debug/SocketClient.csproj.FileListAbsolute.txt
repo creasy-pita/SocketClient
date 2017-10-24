@@ -1,0 +1,6 @@
+E:\work\myproject\dotnet\SocketClient\bin\Debug\SocketClient.exe.config
+E:\work\myproject\dotnet\SocketClient\bin\Debug\SocketClient.exe
+E:\work\myproject\dotnet\SocketClient\bin\Debug\SocketClient.pdb
+E:\work\myproject\dotnet\SocketClient\obj\Debug\SocketClient.csprojResolveAssemblyReference.cache
+E:\work\myproject\dotnet\SocketClient\obj\Debug\SocketClient.exe
+E:\work\myproject\dotnet\SocketClient\obj\Debug\SocketClient.pdb
